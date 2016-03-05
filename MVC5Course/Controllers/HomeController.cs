@@ -17,7 +17,7 @@ namespace MVC5Course.Controllers
         {
 
             ViewBag.Message = "Your application description page.";
-            ViewBag.Message = "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW";
+            
             return View();
         }
 
@@ -25,6 +25,10 @@ namespace MVC5Course.Controllers
         {
             ViewBag.Message = "Your contact page.";
 
+            return View();
+        }
+        public ActionResult Test()
+        {
             return View();
         }
     }
