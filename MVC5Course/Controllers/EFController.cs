@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using MVC5Course.Models;
 using System.Data.Entity.Validation;
-
+using System.Data.Entity;
 namespace MVC5Course.Controllers
 {
     public class EFController : Controller
@@ -56,7 +54,7 @@ namespace MVC5Course.Controllers
 
             return View(data);
         }
-        [HttpPost]
+        [HttpGet]
         public ActionResult Index(bool? isActive, string keyword)
         {
             var data = db.Product.OrderByDescending(p => p.ProductId).AsQueryable();
@@ -103,6 +101,17 @@ namespace MVC5Course.Controllers
 
             db.SaveChanges();
             return RedirectToAction("Index");
+        }
+        public ActionResult QueryPlan(int num=10)
+        {
+            var data = db.Product.Include(t => t.OrderLine).OrderBy(p => p.ProductId).AsQueryable();
+
+            //var data = db.Database.SqlQuery<Product>(@"
+            //            SELECT * 
+            //            FROM dbo.Product p
+            //            WHERE p.ProductId < @p0", num);
+            
+            return View(data);
         }
     }
 }

@@ -60,10 +60,23 @@
             <PropertyRef Name="ProductId" />
           </Key>
           <Property Name="ProductId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="ProductName" Type="varchar" MaxLength="80" />
+          <Property Name="ProductName" Type="nvarchar" MaxLength="80" />
           <Property Name="Price" Type="smallmoney" />
           <Property Name="Active" Type="bit" />
           <Property Name="Stock" Type="numeric" Precision="18" Scale="3" />
+        </EntityType>
+        <!--產生期間發現錯誤:
+警告 6002: 資料表/檢視 'C:\USERS\S9311\DESKTOP\MVC5COURSE\MVC5COURSE\APP_DATA\FABRICS.MDF.dbo.vwClientOrder' 未定義主索引鍵。已推斷此索引鍵，並將定義建立成唯讀的資料表/檢視。-->
+        <EntityType Name="vwClientOrder">
+          <Key>
+            <PropertyRef Name="clientid" />
+          </Key>
+          <Property Name="clientid" Type="int" Nullable="false" />
+          <Property Name="firstname" Type="varchar" MaxLength="40" />
+          <Property Name="lastname" Type="varchar" MaxLength="40" />
+          <Property Name="orderdate" Type="datetime" />
+          <Property Name="ordertotal" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="orderstatus" Type="char" MaxLength="1" />
         </EntityType>
         <Association Name="FK_Client_Occupation">
           <End Role="Occupation" Type="Self.Occupation" Multiplicity="0..1" />
@@ -113,12 +126,26 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Function Name="usp_Fabrics" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="CreateClients" Type="int" Mode="In" />
+          <Parameter Name="CreateOrders" Type="int" Mode="In" />
+        </Function>
         <EntityContainer Name="FabricsModelStoreContainer">
           <EntitySet Name="Client" EntityType="Self.Client" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Occupation" EntityType="Self.Occupation" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Order" EntityType="Self.Order" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="OrderLine" EntityType="Self.OrderLine" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Product" EntityType="Self.Product" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="vwClientOrder" EntityType="Self.vwClientOrder" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [vwClientOrder].[clientid] AS [clientid], 
+    [vwClientOrder].[firstname] AS [firstname], 
+    [vwClientOrder].[lastname] AS [lastname], 
+    [vwClientOrder].[orderdate] AS [orderdate], 
+    [vwClientOrder].[ordertotal] AS [ordertotal], 
+    [vwClientOrder].[orderstatus] AS [orderstatus]
+    FROM [dbo].[vwClientOrder] AS [vwClientOrder]</DefiningQuery>
+          </EntitySet>
           <AssociationSet Name="FK_Client_Occupation" Association="Self.FK_Client_Occupation">
             <End Role="Occupation" EntitySet="Occupation" />
             <End Role="Client" EntitySet="Client" />
@@ -195,18 +222,7 @@
           <Property Name="Qty" Type="Decimal" Precision="18" Scale="3" Nullable="false" />
           <Property Name="LineTotal" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
           <NavigationProperty Name="Order" Relationship="Self.fk_OrderLine_OrderId" FromRole="OrderLine" ToRole="Order" />
-          <NavigationProperty Name="Product" Relationship="Self.fk_OrderLine_ProductId" FromRole="OrderLine" ToRole="Product" />
-        </EntityType>
-        <EntityType Name="Product">
-          <Key>
-            <PropertyRef Name="ProductId" />
-          </Key>
-          <Property Name="ProductId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="ProductName" Type="String" MaxLength="80" FixedLength="false" Unicode="false" />
-          <Property Name="Price" Type="Decimal" Precision="10" Scale="4" />
-          <Property Name="Active" Type="Boolean" />
-          <Property Name="Stock" Type="Decimal" Precision="18" Scale="3" />
-          <NavigationProperty Name="OrderLine" Relationship="Self.fk_OrderLine_ProductId" FromRole="Product" ToRole="OrderLine" />
+          <NavigationProperty Name="Product" Relationship="FabricsModel.fk_OrderLine_ProductId" FromRole="OrderLine" ToRole="Product" />
         </EntityType>
         <Association Name="FK_Client_Occupation">
           <End Role="Occupation" Type="Self.Occupation" Multiplicity="0..1" />
@@ -244,24 +260,11 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="fk_OrderLine_ProductId">
-          <End Role="Product" Type="Self.Product" Multiplicity="1" />
-          <End Role="OrderLine" Type="Self.OrderLine" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Product">
-              <PropertyRef Name="ProductId" />
-            </Principal>
-            <Dependent Role="OrderLine">
-              <PropertyRef Name="ProductId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <EntityContainer Name="FabricsEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Client" EntityType="Self.Client" />
           <EntitySet Name="Occupation" EntityType="Self.Occupation" />
           <EntitySet Name="Order" EntityType="Self.Order" />
           <EntitySet Name="OrderLine" EntityType="Self.OrderLine" />
-          <EntitySet Name="Product" EntityType="Self.Product" />
           <AssociationSet Name="FK_Client_Occupation" Association="Self.FK_Client_Occupation">
             <End Role="Occupation" EntitySet="Occupation" />
             <End Role="Client" EntitySet="Client" />
@@ -274,11 +277,55 @@
             <End Role="Order" EntitySet="Order" />
             <End Role="OrderLine" EntitySet="OrderLine" />
           </AssociationSet>
-          <AssociationSet Name="fk_OrderLine_ProductId" Association="Self.fk_OrderLine_ProductId">
+          <EntitySet Name="vwClientOrder" EntityType="FabricsModel.vwClientOrder" />
+          <EntitySet Name="Product" EntityType="FabricsModel.Product" />
+          <AssociationSet Name="fk_OrderLine_ProductId" Association="FabricsModel.fk_OrderLine_ProductId">
             <End Role="Product" EntitySet="Product" />
             <End Role="OrderLine" EntitySet="OrderLine" />
           </AssociationSet>
+          <FunctionImport Name="usp_Fabrics" ReturnType="Collection(FabricsModel.usp_Fabrics_Result)">
+            <Parameter Name="CreateClients" Mode="In" Type="Int32" />
+            <Parameter Name="CreateOrders" Mode="In" Type="Int32" />
+          </FunctionImport>
         </EntityContainer>
+        <EntityType Name="vwClientOrder">
+          <Key>
+            <PropertyRef Name="clientid" />
+          </Key>
+          <Property Name="clientid" Type="Int32" Nullable="false" />
+          <Property Name="firstname" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
+          <Property Name="lastname" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
+          <Property Name="orderdate" Type="DateTime" Precision="3" />
+          <Property Name="ordertotal" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="orderstatus" Type="String" MaxLength="1" FixedLength="true" Unicode="false" />
+        </EntityType>
+        <EntityType Name="Product">
+          <Key>
+            <PropertyRef Name="ProductId" />
+          </Key>
+          <Property Name="ProductId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ProductName" Type="String" MaxLength="80" FixedLength="false" Unicode="true" />
+          <Property Name="Price" Type="Decimal" Precision="10" Scale="4" />
+          <Property Name="Active" Type="Boolean" />
+          <Property Name="Stock" Type="Decimal" Precision="18" Scale="3" />
+          <NavigationProperty Name="OrderLine" Relationship="FabricsModel.fk_OrderLine_ProductId" FromRole="Product" ToRole="OrderLine" />
+        </EntityType>
+        <Association Name="fk_OrderLine_ProductId">
+          <End Type="FabricsModel.Product" Role="Product" Multiplicity="1" />
+          <End Type="FabricsModel.OrderLine" Role="OrderLine" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Product">
+              <PropertyRef Name="ProductId" />
+            </Principal>
+            <Dependent Role="OrderLine">
+              <PropertyRef Name="ProductId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <ComplexType Name="usp_Fabrics_Result">
+          <Property Type="String" Name="Table" Nullable="false" MaxLength="10" />
+          <Property Type="Int32" Name="Count" Nullable="true" />
+        </ComplexType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -338,17 +385,37 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="Product">
-            <EntityTypeMapping TypeName="FabricsModel.Product">
-              <MappingFragment StoreEntitySet="Product">
-                <ScalarProperty Name="ProductId" ColumnName="ProductId" />
-                <ScalarProperty Name="ProductName" ColumnName="ProductName" />
-                <ScalarProperty Name="Price" ColumnName="Price" />
-                <ScalarProperty Name="Active" ColumnName="Active" />
-                <ScalarProperty Name="Stock" ColumnName="Stock" />
+          <EntitySetMapping Name="vwClientOrder">
+            <EntityTypeMapping TypeName="FabricsModel.vwClientOrder">
+              <MappingFragment StoreEntitySet="vwClientOrder">
+                <ScalarProperty Name="orderstatus" ColumnName="orderstatus" />
+                <ScalarProperty Name="ordertotal" ColumnName="ordertotal" />
+                <ScalarProperty Name="orderdate" ColumnName="orderdate" />
+                <ScalarProperty Name="lastname" ColumnName="lastname" />
+                <ScalarProperty Name="firstname" ColumnName="firstname" />
+                <ScalarProperty Name="clientid" ColumnName="clientid" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="Product">
+            <EntityTypeMapping TypeName="FabricsModel.Product">
+              <MappingFragment StoreEntitySet="Product">
+                <ScalarProperty Name="Stock" ColumnName="Stock" />
+                <ScalarProperty Name="Active" ColumnName="Active" />
+                <ScalarProperty Name="Price" ColumnName="Price" />
+                <ScalarProperty Name="ProductName" ColumnName="ProductName" />
+                <ScalarProperty Name="ProductId" ColumnName="ProductId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="usp_Fabrics" FunctionName="FabricsModel.Store.usp_Fabrics">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="FabricsModel.usp_Fabrics_Result">
+                <ScalarProperty Name="Table" ColumnName="Table" />
+                <ScalarProperty Name="Count" ColumnName="Count" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
