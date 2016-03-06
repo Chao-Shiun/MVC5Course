@@ -24,7 +24,7 @@ namespace MVC5Course.Models
         [Required]
         public string ProductName { get; set; }
         [Required]
-        [Range(1,1234,ErrorMessage ="1~1234")]
+        [Range(1,100,ErrorMessage ="必須介於1~100")]
         public Nullable<decimal> Price { get; set; }
         [Required]
         public Nullable<bool> Active { get; set; }
