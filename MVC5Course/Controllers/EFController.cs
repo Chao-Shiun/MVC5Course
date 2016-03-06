@@ -50,9 +50,24 @@ namespace MVC5Course.Controllers
 
             //var data = db.Product.Where(p => p.ProductId == pkey).ToList();
 
-            var data = db.Product.OrderByDescending(p => p.ProductId).Take(5);
+            var data = db.Product.OrderByDescending(p => p.ProductId).Take(50);
 
             //var data = db.Product.ToList();
+
+            return View(data);
+        }
+        [HttpPost]
+        public ActionResult Index(bool? isActive, string keyword)
+        {
+            var data = db.Product.OrderByDescending(p => p.ProductId).AsQueryable();
+            if (isActive.HasValue)
+            {
+                data = data.Where(p => p.Active.HasValue ? p.Active.Value == isActive.Value : false);
+            }
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                data = data.Where(p => p.ProductName.Contains(keyword));
+            }
 
             return View(data);
         }
@@ -66,8 +81,26 @@ namespace MVC5Course.Controllers
         }
         public ActionResult Delete(int id)
         {
-            var item = db.Product.Find(id);
-            db.Product.Remove(item);
+            //var item = db.Product.Find(id);
+            //db.Product.Remove(item);
+            var product = db.Product.Find(id);
+
+            //刪除關聯資料的方法一
+            /*foreach (var item in db.OrderLine.Where(p=>p.ProductId==id).ToList())
+            {
+                db.OrderLine.Remove(ol);
+            }*/
+
+            //刪除關聯資料的方法二
+            /*foreach (var ol in product.OrderLine.ToList())
+            {
+                    db.OrderLine.Remove(ol);
+            }*/
+
+            //刪除關聯資料的方法三
+            db.OrderLine.RemoveRange(product.OrderLine);
+            db.Product.Remove(product);
+
             db.SaveChanges();
             return RedirectToAction("Index");
         }
