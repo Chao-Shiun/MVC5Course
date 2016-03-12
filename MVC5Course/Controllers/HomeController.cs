@@ -6,19 +6,19 @@ using System.Web.Mvc;
 
 namespace MVC5Course.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         public ActionResult Index()
         {
             return View();
         }
-
+        
         public ActionResult About()
         {
 
             ViewBag.Message = "Your application description page.";
             
-            return View();
+            return View("About");
         }
 
         public ActionResult Contact()
@@ -27,7 +27,8 @@ namespace MVC5Course.Controllers
 
             return View();
         }
-        public ActionResult Test()
+        
+        private ActionResult Test()
         {
             return View();
         }

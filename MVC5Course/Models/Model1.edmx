@@ -64,6 +64,7 @@
           <Property Name="Price" Type="smallmoney" />
           <Property Name="Active" Type="bit" />
           <Property Name="Stock" Type="numeric" Precision="18" Scale="3" />
+          <Property Name="IsDeleted" Type="bit" Nullable="false" />
         </EntityType>
         <!--產生期間發現錯誤:
 警告 6002: 資料表/檢視 'C:\USERS\S9311\DESKTOP\MVC5COURSE\MVC5COURSE\APP_DATA\FABRICS.MDF.dbo.vwClientOrder' 未定義主索引鍵。已推斷此索引鍵，並將定義建立成唯讀的資料表/檢視。-->
@@ -278,15 +279,15 @@
             <End Role="OrderLine" EntitySet="OrderLine" />
           </AssociationSet>
           <EntitySet Name="vwClientOrder" EntityType="FabricsModel.vwClientOrder" />
+          <FunctionImport Name="usp_Fabrics" ReturnType="Collection(FabricsModel.usp_Fabrics_Result)">
+            <Parameter Name="CreateClients" Mode="In" Type="Int32" />
+            <Parameter Name="CreateOrders" Mode="In" Type="Int32" />
+          </FunctionImport>
           <EntitySet Name="Product" EntityType="FabricsModel.Product" />
           <AssociationSet Name="fk_OrderLine_ProductId" Association="FabricsModel.fk_OrderLine_ProductId">
             <End Role="Product" EntitySet="Product" />
             <End Role="OrderLine" EntitySet="OrderLine" />
           </AssociationSet>
-          <FunctionImport Name="usp_Fabrics" ReturnType="Collection(FabricsModel.usp_Fabrics_Result)">
-            <Parameter Name="CreateClients" Mode="In" Type="Int32" />
-            <Parameter Name="CreateOrders" Mode="In" Type="Int32" />
-          </FunctionImport>
         </EntityContainer>
         <EntityType Name="vwClientOrder">
           <Key>
@@ -299,6 +300,10 @@
           <Property Name="ordertotal" Type="Decimal" Precision="18" Scale="2" />
           <Property Name="orderstatus" Type="String" MaxLength="1" FixedLength="true" Unicode="false" />
         </EntityType>
+        <ComplexType Name="usp_Fabrics_Result">
+          <Property Type="String" Name="Table" Nullable="false" MaxLength="10" />
+          <Property Type="Int32" Name="Count" Nullable="true" />
+        </ComplexType>
         <EntityType Name="Product">
           <Key>
             <PropertyRef Name="ProductId" />
@@ -308,6 +313,7 @@
           <Property Name="Price" Type="Decimal" Precision="10" Scale="4" />
           <Property Name="Active" Type="Boolean" />
           <Property Name="Stock" Type="Decimal" Precision="18" Scale="3" />
+          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
           <NavigationProperty Name="OrderLine" Relationship="FabricsModel.fk_OrderLine_ProductId" FromRole="Product" ToRole="OrderLine" />
         </EntityType>
         <Association Name="fk_OrderLine_ProductId">
@@ -322,10 +328,6 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <ComplexType Name="usp_Fabrics_Result">
-          <Property Type="String" Name="Table" Nullable="false" MaxLength="10" />
-          <Property Type="Int32" Name="Count" Nullable="true" />
-        </ComplexType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -397,17 +399,6 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="Product">
-            <EntityTypeMapping TypeName="FabricsModel.Product">
-              <MappingFragment StoreEntitySet="Product">
-                <ScalarProperty Name="Stock" ColumnName="Stock" />
-                <ScalarProperty Name="Active" ColumnName="Active" />
-                <ScalarProperty Name="Price" ColumnName="Price" />
-                <ScalarProperty Name="ProductName" ColumnName="ProductName" />
-                <ScalarProperty Name="ProductId" ColumnName="ProductId" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <FunctionImportMapping FunctionImportName="usp_Fabrics" FunctionName="FabricsModel.Store.usp_Fabrics">
             <ResultMapping>
               <ComplexTypeMapping TypeName="FabricsModel.usp_Fabrics_Result">
@@ -416,6 +407,18 @@
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>
+          <EntitySetMapping Name="Product">
+            <EntityTypeMapping TypeName="FabricsModel.Product">
+              <MappingFragment StoreEntitySet="Product">
+                <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+                <ScalarProperty Name="Stock" ColumnName="Stock" />
+                <ScalarProperty Name="Active" ColumnName="Active" />
+                <ScalarProperty Name="Price" ColumnName="Price" />
+                <ScalarProperty Name="ProductName" ColumnName="ProductName" />
+                <ScalarProperty Name="ProductId" ColumnName="ProductId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

@@ -6,17 +6,37 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
+using MVC5Course.Models;
 
-namespace MVC5Course.Models
+namespace MVC5Course.Controllers
 {
-    public class ProductsController : Controller
+    public class ProductsController : BaseController
     {
-        private FabricsEntities db = new FabricsEntities();
+        //private FabricsEntities db = new FabricsEntities();
 
         // GET: Products
         public ActionResult Index()
         {
-            return View(db.Product.ToList());
+            var data = repo.All().Take(5);
+            //var data = repo.Get超級複雜的資料集();
+            //var repoOL = RepositoryHelper.GetOrderLineRepository(repo.UnitOfWork);
+            //ViewData.Model = data;//強型別
+
+            return View(data);
+            //return View(db.Product.Where(p => !p.IsDeleted));
+        }
+        [HttpPost]
+        public ActionResult Index(IList<Product> products)//這是使用強型別的model binder，也可這樣寫Product[]
+        {                                                 //參數名稱要注意要跟View的變數一樣名稱
+            foreach (var item in products)
+            {
+                var product = repo.Find(item.ProductId);
+                product.Stock = item.Stock;
+                product.Price = item.Price;
+            }
+            repo.UnitOfWork.Commit();
+
+            return RedirectToAction("Index");
         }
 
         // GET: Products/Details/5
@@ -26,11 +46,13 @@ namespace MVC5Course.Models
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Product product = db.Product.Find(id);
+            Product product = repo.Find(id.Value);
             if (product == null)
             {
                 return HttpNotFound();
             }
+            //ViewData["OrderLines"] = product.OrderLine.ToList();
+            ViewBag.OrderLines = product.OrderLine.ToList();
             return View(product);
         }
 
@@ -49,8 +71,9 @@ namespace MVC5Course.Models
         {
             if (ModelState.IsValid)
             {
-                db.Product.Add(product);
-                db.SaveChanges();
+                repo.Add(product);
+                repo.UnitOfWork.Commit();
+                TempData["ProductsEditDoneMsg"] = "商品編輯成功";
                 return RedirectToAction("Index");
             }
 
@@ -64,7 +87,7 @@ namespace MVC5Course.Models
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Product product = db.Product.Find(id);
+            Product product = repo.Find(id.Value);
             if (product == null)
             {
                 return HttpNotFound();
@@ -81,8 +104,10 @@ namespace MVC5Course.Models
         {
             if (ModelState.IsValid)
             {
+                var db = (FabricsEntities)repo.UnitOfWork.Context;
                 db.Entry(product).State = EntityState.Modified;
                 db.SaveChanges();
+                TempData["ProductsEditDoneMsg"] = "商品編輯成功";
                 return RedirectToAction("Index");
             }
             return View(product);
@@ -95,7 +120,7 @@ namespace MVC5Course.Models
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Product product = db.Product.Find(id);
+            Product product = repo.Find(id.Value);
             if (product == null)
             {
                 return HttpNotFound();
@@ -108,9 +133,9 @@ namespace MVC5Course.Models
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Product product = db.Product.Find(id);
-            db.Product.Remove(product);
-            db.SaveChanges();
+            Product product = repo.Find(id);
+            product.IsDeleted = true;
+            repo.UnitOfWork.Commit();
             return RedirectToAction("Index");
         }
 
@@ -118,6 +143,7 @@ namespace MVC5Course.Models
         {
             if (disposing)
             {
+                var db = (FabricsEntities)repo.UnitOfWork.Context;
                 db.Dispose();
             }
             base.Dispose(disposing);

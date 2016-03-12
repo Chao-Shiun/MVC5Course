@@ -6,7 +6,7 @@ using System.Data.Entity.Validation;
 using System.Data.Entity;
 namespace MVC5Course.Controllers
 {
-    public class EFController : Controller
+    public class EFController : BaseController
     {
         FabricsEntities db = new FabricsEntities();
         // GET: EF

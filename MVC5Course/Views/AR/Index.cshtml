@@ -1,0 +1,37 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+@* table.table>tr*2>td*5 *@
+<button id="btnJsonTest">取得 JsonTest 資料</button>
+
+<table class="table" ng-app ng-controller="">
+    <tr>
+        <th>ProdcutId</th>
+        <th>Stock</th>
+        <th>Scope</th>
+        <th>Pirce</th>
+        <th>Active</th>
+    </tr>
+    <tr ng-repeat="item in data">
+        <td>{{item.ProdcutId}}</td>
+        <td>{{item.Stock}}</td>
+        <td>{{item.Scope}}</td>
+        <td>{{item.Pirce}}</td>
+        <td>{{item.Active}}</td>
+    </tr>
+</table>
+
+<script src="~/Scripts/angular.js"></script>
+@section Scripts {
+    <script>
+        $('#btnJsonTest').bind('click', function () {
+            debugger;
+            $.getJSON('/AR/JsonTest', '', function (data) {
+                console.log(data);
+            })
+        });
+    </script>
+}
