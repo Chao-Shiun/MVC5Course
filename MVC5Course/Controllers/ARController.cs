@@ -1,4 +1,5 @@
-﻿using MVC5Course.Models;
+﻿using Microsoft.Web.Mvc;
+using MVC5Course.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,7 +34,7 @@ namespace MVC5Course.Controllers
         {
             throw new NotImplementedException();
         }
-
+        [AjaxOnly]
         public ActionResult JsonTest()
         {
             var db = new FabricsEntities();
