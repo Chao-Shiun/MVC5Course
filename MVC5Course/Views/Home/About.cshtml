@@ -1,14 +1,35 @@
-﻿@{
+﻿
+@{
     //Layout = "";
     ViewBag.Title = "About";
+    if (IsAjax)
+    {
+        Layout = "";
+    }
 }
 <h2>@ViewBag.Title.</h2>
 <h3>@ViewBag.Message</h3>
 
 <p>Use this area to provide additional information.</p>
 @*@section breadcrumb {
-    <li><a href="#">@ViewBag.Title</a></li>
-}*@
+        <li><a href="#">@ViewBag.Title</a></li>
+    }*@
+@*
+    @Request.IsLocal    檢查是否是在主機
+*@
+
+@*兩種建立超連結方式*@
+@Html.ActionLink(" ", "Index", null, new { @class = "btn btn-primary", Chao_Shiun = "Chen" })
+@*
+    注意：要在ActionLink宣告Class要在前面加上@才能執行
+*@
+
+<a href="@Url.Action("Index")" class="btn btn-primary" Chao-Shiun="Chen"></a>
+@*
+    可在href套用Url.Action()
+    這種寫法宣告attribute比較方便
+*@
+
 @section scripts
 {
     <script>
