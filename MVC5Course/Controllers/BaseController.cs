@@ -7,6 +7,8 @@ using System.Web.Mvc;
 
 namespace MVC5Course.Controllers
 {
+    //[Authorize]認證專用
+    //ActionFilter寫在父類別，代表全部繼承這個Controller的都會套用ActionFilter
     public abstract class BaseController : Controller
     {
         protected ProductRepository repo = RepositoryHelper.GetProductRepository();
