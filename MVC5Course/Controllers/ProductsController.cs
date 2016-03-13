@@ -58,7 +58,7 @@ namespace MVC5Course.Controllers
                 return HttpNotFound();
             }
             //ViewData["OrderLines"] = product.OrderLine.ToList();
-            ViewBag.OrderLines = product.OrderLine.ToList();
+            //ViewBag.OrderLines = product.OrderLine.ToList();
             return View(product);
         }
 
