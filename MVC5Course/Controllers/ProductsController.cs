@@ -7,6 +7,8 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using MVC5Course.Models;
+using System.Data.Entity.Validation;
+using System.Data.SqlClient;
 
 namespace MVC5Course.Controllers
 {
@@ -26,17 +28,21 @@ namespace MVC5Course.Controllers
             //return View(db.Product.Where(p => !p.IsDeleted));
         }
         [HttpPost]
-        public ActionResult Index(IList<Product> products)//這是使用強型別的model binder，也可這樣寫Product[]
+        //public ActionResult Index(IList<Product> products)//這是使用強型別的model binder，也可這樣寫Product[]
+        public ActionResult Index(IList<Products批次更新VIewModel> data)
         {                                                 //參數名稱要注意要跟View的變數一樣名稱
-            foreach (var item in products)
+            if (ModelState.IsValid)
             {
-                var product = repo.Find(item.ProductId);
-                product.Stock = item.Stock;
-                product.Price = item.Price;
+                foreach (var item in data)
+                {
+                    var product = repo.Find(item.ProductId);
+                    product.Stock = item.Stock;
+                    product.Price = item.Price;
+                }
+                repo.UnitOfWork.Commit();
+                return RedirectToAction("Index");
             }
-            repo.UnitOfWork.Commit();
-
-            return RedirectToAction("Index");
+            return View(repo.All().Take(5));
         }
 
         // GET: Products/Details/5
@@ -100,13 +106,48 @@ namespace MVC5Course.Controllers
         // 詳細資訊，請參閱 http://go.microsoft.com/fwlink/?LinkId=317598。
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "ProductId,ProductName,Price,Active,Stock")] Product product)
+        //public ActionResult Edit([Bind(Include = "ProductId,ProductName,Price,Active,Stock")] Product product)
+        public ActionResult Edit(int id, FormCollection form)//後面FormCollection純粹為了overload辨識
         {
-            if (ModelState.IsValid)
+            Product product = repo.Find(id);
+
+            //if (ModelState.IsValid)
+            
+            if (TryUpdateModel<Product>(product, new string[] {
+                "ProductId","ProductName","Price","Active","Stock"
+            }))
             {
-                var db = (FabricsEntities)repo.UnitOfWork.Context;
+                /*var db = (FabricsEntities)repo.UnitOfWork.Context;
                 db.Entry(product).State = EntityState.Modified;
-                db.SaveChanges();
+                db.SaveChanges();*/
+                try
+                {
+                    //TryUpdateModel一樣會做model驗證，失敗就回傳false，實做過程中，Commit()有Exception可能是資料庫來的
+                    repo.UnitOfWork.Commit();
+                }
+                catch (DbEntityValidationException ex)
+                {
+                    foreach (DbEntityValidationResult item in ex.EntityValidationErrors)
+                    {
+                        string EntityName = item.Entry.Entity.GetType().Name;
+                        foreach (var err in item.ValidationErrors)
+                        {
+                            throw new Exception(err.ErrorMessage);
+                            //throw new Exception(err.ErrorMessage);
+                            //return ViewBag(err.ErrorMessage);
+
+                        }
+                    }
+                    //if (allErrorList.Count != 0)
+                    //    return View(allErrorList.ToList());
+
+                }catch(SqlException SE)
+                {
+                    throw SE;
+                }catch(Exception EX)
+                {
+                    throw EX;
+                }
                 TempData["ProductsEditDoneMsg"] = "商品編輯成功";
                 return RedirectToAction("Index");
             }

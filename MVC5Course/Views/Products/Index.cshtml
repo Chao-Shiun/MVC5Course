@@ -66,28 +66,30 @@
             +            data[1].ProductName
             +        *@
         @{
-            var products = Model.ToArray();
+            var data = Model.ToArray();
         }
-        @for (var i = 0; i < products.Length; i++)
+        @for (var i = 0; i < data.Length; i++)
         {
-            @Html.HiddenFor(modelItem => products[i].ProductId)
+            @Html.HiddenFor(modelItem => data[i].ProductId)
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => products[i].ProductName)
+                    @Html.DisplayFor(modelItem => data[i].ProductName)
                 </td>
                 <td>
-                    @Html.EditorFor(modelItem => products[i].Price)
+                    @Html.EditorFor(modelItem => data[i].Price)<br />
+                    @Html.ValidationMessageFor(modelItem => data[i].Price)
                 </td>
                 <td>
-                    @Html.EditorFor(modelItem => products[i].Stock)
+                    @Html.EditorFor(modelItem => data[i].Stock)<br />
+                    @Html.ValidationMessageFor(modelItem => data[i].Stock)
                 </td>
                 <td>
-                    @Html.ActionLink("Edit", "Edit", new { id = products[i].ProductId }) |
-                    @Html.ActionLink("Details", "Details", new { id = products[i].ProductId }) |
-                    @Html.ActionLink("Delete", "Delete", new { id = products[i].ProductId })
+                    @Html.ActionLink("Edit", "Edit", new { id = data[i].ProductId }) |
+                    @Html.ActionLink("Details", "Details", new { id = data[i].ProductId }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = data[i].ProductId })
                 </td>
             </tr>
         }
     </table>
     <button class="btn btn-primary">批次更新</button>
-            }
+}
