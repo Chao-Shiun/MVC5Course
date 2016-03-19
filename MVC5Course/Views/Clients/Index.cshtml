@@ -7,7 +7,7 @@
 <h2>Index</h2>
 
 <p>
-    @Html.ActionLink("Create New", "Create")
+    @Ajax.ActionLink("Create New", "Create", new AjaxOptions() { UpdateTargetId = "AjaxPanel" })
 </p>
 <table class="table">
     <tr>
@@ -54,11 +54,15 @@
                 @Html.DisplayFor(modelItem => item.CreditRating)
             </td>
             <td>
-                @Html.ActionLink("Edit", "Edit", new { id = item.ClientId }) |
-                @Html.ActionLink("Details", "Details", new { id = item.ClientId }) |
-                @Html.ActionLink("Delete", "Delete", new { id = item.ClientId })
+                @Ajax.ActionLink("Edit", "Edit", new { id = item.ClientId }, new AjaxOptions() { UpdateTargetId = "AjaxPanel" }) |
+                @Ajax.ActionLink("Details", "Details", new { id = item.ClientId }, new AjaxOptions() { UpdateTargetId = "AjaxPanel" }) |
+                @Ajax.ActionLink("Delete", "Delete", new { id = item.ClientId }, new AjaxOptions() { UpdateTargetId = "AjaxPanel" })
             </td>
         </tr>
     }
 
 </table>
+
+<div id="AjaxPanel">
+
+</div>
