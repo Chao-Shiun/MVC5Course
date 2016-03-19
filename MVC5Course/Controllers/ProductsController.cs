@@ -17,12 +17,17 @@ namespace MVC5Course.Controllers
         //private FabricsEntities db = new FabricsEntities();
 
         // GET: Products
-        public ActionResult Index()
+        public ActionResult Index(int? ProductId, string type)
         {
             var data = repo.All().Take(5);
             //var data = repo.Get超級複雜的資料集();
             //var repoOL = RepositoryHelper.GetOrderLineRepository(repo.UnitOfWork);
             //ViewData.Model = data;//強型別
+            ViewBag.type = type;
+            if(ProductId.HasValue)
+            {
+                ViewBag.SelectedProductId = ProductId.Value;
+            }
 
             return View(data);
             //return View(db.Product.Where(p => !p.IsDeleted));

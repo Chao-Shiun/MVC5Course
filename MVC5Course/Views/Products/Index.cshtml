@@ -4,8 +4,8 @@
 }
 <h2>Index</h2>
 @*@section breadcrumb{
-    <li><a href="#">產品清單</a></li>
-}*@
+        <li><a href="#">產品清單</a></li>
+    }*@
 <p>
     @Html.ActionLink("Create New", "Create")
 </p>
@@ -71,7 +71,11 @@
         @for (var i = 0; i < data.Length; i++)
         {
             @Html.HiddenFor(modelItem => data[i].ProductId)
-            <tr>
+            if (ViewBag.SelectedProductId != null && ViewBag.SelectedProductId == data[i].ProductId)
+            {
+                ViewBag.SelectedProductItem = data[i];
+            }
+            <tr @if (ViewBag.SelectedProductId != null && ViewBag.SelectedProductId == data[i].ProductId) { @Html.Raw("style='background-color: lightyellow;'")   }>
                 <td>
                     @Html.DisplayFor(modelItem => data[i].ProductName)
                 </td>
@@ -85,11 +89,24 @@
                 </td>
                 <td>
                     @Html.ActionLink("Edit", "Edit", new { id = data[i].ProductId }) |
-                    @Html.ActionLink("Details", "Details", new { id = data[i].ProductId }) |
-                    @Html.ActionLink("Delete", "Delete", new { id = data[i].ProductId })
+                    @Html.ActionLink("Details", "Index", new { type = "Details", ProductId = data[i].ProductId }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = data[i].ProductId })|
+                    @Html.ActionLink("OrderLines", "Index", new { type = "OrderLines", ProductId = data[i].ProductId })
                 </td>
             </tr>
         }
     </table>
     <button class="btn btn-primary">批次更新</button>
             }
+
+@if (ViewBag.SelectedProductId != null)
+{
+    if (ViewBag.type == "Details")
+    {
+        @Html.Partial("Details", ViewData["SelectedProductItem"])
+    }
+    else
+    {
+        @Html.Action("Index", "OrderLines", new { ProductId = ViewBag.SelectedProductId })
+    }
+}

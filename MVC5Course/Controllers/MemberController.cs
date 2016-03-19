@@ -36,8 +36,8 @@ namespace MVC5Course.Controllers
         {
             return email == "e4366.tw@gmail.com" && password == "1234";
         }
-
-        private ActionResult Logout()
+        
+        public ActionResult Logout()
         {
             FormsAuthentication.SignOut();
             return RedirectToAction("Index","Home");
