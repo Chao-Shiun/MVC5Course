@@ -1,12 +1,16 @@
 ﻿@model IEnumerable<MVC5Course.Models.Client>
-
+@using PagedList
+@using PagedList.Mvc
+@{
+    var data = Model as IPagedList<Client>;
+}
 @{
     ViewBag.Title = "Index";
-    if(IsAjax)
+    if (IsAjax)
     {
         Layout = "";
     }
-    var CommAjaxOptions = new AjaxOptions() { UpdateTargetId = "AjaxPanel" };
+    var CommAjaxOptions = new AjaxOptions() { UpdateTargetId = "AjaxPanel", LoadingElementId = "loading" };
 }
 
 
@@ -14,7 +18,9 @@
 
 <p>
     @Ajax.ActionLink("Create New", "Create", CommAjaxOptions)
+    <img id="loading" src="~/Content/ajax-loader.gif" style="display: none" />
 </p>
+@Html.PagedListPager(data, p => Url.Action("Index", new { pageNo = p }))
 <table class="table">
     <tr>
         <th>
@@ -69,6 +75,7 @@
 
 </table>
 
+@Html.PagedListPager(data, p => Url.Action("Index", new { pageNo = p }))
 <div id="AjaxPanel">
 
 </div>
