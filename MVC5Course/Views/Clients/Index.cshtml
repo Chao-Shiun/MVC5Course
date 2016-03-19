@@ -13,14 +13,13 @@
     var CommAjaxOptions = new AjaxOptions() { UpdateTargetId = "AjaxPanel", LoadingElementId = "loading" };
 }
 
-
 <h2>Index</h2>
 
 <p>
     @Ajax.ActionLink("Create New", "Create", CommAjaxOptions)
     <img id="loading" src="~/Content/ajax-loader.gif" style="display: none" />
 </p>
-@Html.PagedListPager(data, p => Url.Action("Index", new { pageNo = p }))
+@Html.PagedListPager(data, p => Url.Action("Index", new { pageNo = p }), PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing("main"))
 <table class="table">
     <tr>
         <th>
@@ -75,7 +74,7 @@
 
 </table>
 
-@Html.PagedListPager(data, p => Url.Action("Index", new { pageNo = p }))
+@Html.PagedListPager(data, p => Url.Action("Index", new { pageNo = p }),PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing("main"))
 <div id="AjaxPanel">
 
 </div>
