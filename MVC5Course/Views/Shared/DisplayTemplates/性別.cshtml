@@ -1,0 +1,14 @@
+﻿@model String
+
+@switch (Model)
+{
+    case "M":
+        @:男性
+        break;
+    case "F":
+        @:女性
+        break;
+    default:
+        @:不確定
+        break;
+}

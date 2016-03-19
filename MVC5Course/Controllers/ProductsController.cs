@@ -17,19 +17,34 @@ namespace MVC5Course.Controllers
         //private FabricsEntities db = new FabricsEntities();
 
         // GET: Products
-        public ActionResult Index(int? ProductId, string type)
+        public ActionResult Index(int? ProductId, string type, bool? isActive, string keyword)
         {
-            var data = repo.All().Take(5);
+            var data = repo.All(true);
+            if (isActive.HasValue)
+            {
+                data = data.Where(p => p.Active.HasValue && p.Active.Value == isActive.Value);
+            }
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                data = data.Where(p => p.ProductName.Contains(keyword));
+            }
+
+            var items = new List<SelectListItem>();
+            items.Add(new SelectListItem() { Value = "true", Text = "有效" });
+            items.Add(new SelectListItem() { Value = "false", Text = "無效" });
+            ViewData["isActive"] = new SelectList(items, "Value", "Text");
+
             //var data = repo.Get超級複雜的資料集();
             //var repoOL = RepositoryHelper.GetOrderLineRepository(repo.UnitOfWork);
             //ViewData.Model = data;//強型別
+
             ViewBag.type = type;
-            if(ProductId.HasValue)
+            if (ProductId.HasValue)
             {
                 ViewBag.SelectedProductId = ProductId.Value;
             }
 
-            return View(data);
+            return View(data.Take(5));
             //return View(db.Product.Where(p => !p.IsDeleted));
         }
         [HttpPost]
@@ -117,7 +132,7 @@ namespace MVC5Course.Controllers
             Product product = repo.Find(id);
 
             //if (ModelState.IsValid)
-            
+
             if (TryUpdateModel<Product>(product, new string[] {
                 "ProductId","ProductName","Price","Active","Stock"
             }))
@@ -146,10 +161,12 @@ namespace MVC5Course.Controllers
                     //if (allErrorList.Count != 0)
                     //    return View(allErrorList.ToList());
 
-                }catch(SqlException SE)
+                }
+                catch (SqlException SE)
                 {
                     throw SE;
-                }catch(Exception EX)
+                }
+                catch (Exception EX)
                 {
                     throw EX;
                 }

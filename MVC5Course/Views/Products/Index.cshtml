@@ -6,14 +6,19 @@
 @*@section breadcrumb{
         <li><a href="#">產品清單</a></li>
     }*@
-<p>
-    @Html.ActionLink("Create New", "Create")
-</p>
-@if (!String.IsNullOrEmpty(Convert.ToString(TempData["ProductsEditDoneMsg"])))
+@using (Html.BeginForm("Index","Products",FormMethod.Get))
 {
-    <h3>@TempData["ProductsEditDoneMsg"]</h3>
-}
+    <p>
+        @Html.ActionLink("Create New", "Create")
+        @Html.DropDownList("isActive",null, "--是否有效--",new { onchange = "this.form.submit();" })
 
+        @Html.TextBox("keyword",null,new { onchange="this.form.submit();" })
+        @if (!String.IsNullOrEmpty(Convert.ToString(TempData["ProductsEditDoneMsg"])))
+        {
+            <h3>@TempData["ProductsEditDoneMsg"]</h3>
+        }
+    </p>
+}
 @using (Html.BeginForm())
 {
     <table class="table">
@@ -26,9 +31,9 @@
                 @Html.DisplayNameFor(model => model.Price)
 
             </th>
-            @*<th>
+            <th>
                     @Html.DisplayNameFor(model => model.Active)
-                </th>*@
+                </th>
             <th>
                 @Html.DisplayNameFor(model => model.Stock)
 
@@ -75,13 +80,16 @@
             {
                 ViewBag.SelectedProductItem = data[i];
             }
-            <tr @if (ViewBag.SelectedProductId != null && ViewBag.SelectedProductId == data[i].ProductId) { @Html.Raw("style='background-color: lightyellow;'")   }>
+            <tr @if (ViewBag.SelectedProductId != null && ViewBag.SelectedProductId == data[i].ProductId) { @Html.Raw("style='background-color: lightyellow;'")      }>
                 <td>
                     @Html.DisplayFor(modelItem => data[i].ProductName)
                 </td>
                 <td>
                     @Html.EditorFor(modelItem => data[i].Price)<br />
                     @Html.ValidationMessageFor(modelItem => data[i].Price)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem=>data[i].Active)
                 </td>
                 <td>
                     @Html.EditorFor(modelItem => data[i].Stock)<br />
@@ -96,14 +104,19 @@
             </tr>
         }
     </table>
-    <button class="btn btn-primary">批次更新</button>
+        <button class="btn btn-primary">批次更新</button>
             }
 
 @if (ViewBag.SelectedProductId != null)
 {
     if (ViewBag.type == "Details")
     {
-        @Html.Partial("Details", ViewData["SelectedProductItem"])
+        //@Html.Partial("Details", ViewData["SelectedProductItem"])
+        if (ViewData["SelectProductItem"] != null)
+        {
+            @Html.Partial("Details", ViewData["SelectedProductItem"])
+
+        }
     }
     else
     {
