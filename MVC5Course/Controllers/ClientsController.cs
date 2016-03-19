@@ -18,7 +18,7 @@ namespace MVC5Course.Controllers
         public ActionResult Index()
         {
             var client = db.Client.Include(c => c.Occupation);
-            return View(client.ToList().Take(5));
+            return View("Index", client.ToList().OrderByDescending(x => x.ClientId).Take(5));
         }
 
         // GET: Clients/Details/5
@@ -88,7 +88,12 @@ namespace MVC5Course.Controllers
             {
                 db.Entry(client).State = EntityState.Modified;
                 db.SaveChanges();
-                return RedirectToAction("Index");
+                return this.Index();
+                /*
+                傳入此字典的模型項目為型別 'System.Collections.Generic.List`1[MVC5Course.Models.Client]'，但是此字典需要型別 'MVC5Course.Models.Client' 的模型項目。
+                */
+                //return View("Index",db.Client.Include(c => c.Occupation).OrderByDescending(x => x.ClientId).Take(5).ToList());
+                //return RedirectToAction("Index");
             }
             ViewBag.OccupationId = new SelectList(db.Occupation, "OccupationId", "OccupationName", client.OccupationId);
             return View(client);

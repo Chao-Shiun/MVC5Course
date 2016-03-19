@@ -28,13 +28,16 @@
                     <li>@Html.ActionLink("測試", "Test", "Home")</li>
                     <li>@Html.ActionLink("產品資料修改", "Index", "Products")</li>
                     <li>@Html.ActionLink("Entity新增例外範例", "Index", "EF")</li>
+                    <li>@Html.ActionLink("客戶管理", "Index", "Clients")</li>
                 </ul>
                 @Html.Partial("_LoginPartial")
             </div>
         </div>
     </div>
     <div class="container body-content">
-        @RenderBody()@*在此載入layout內容*@
+        <div id="main">
+            @RenderBody()@*在此載入layout內容*@
+        </div>
         <hr />
         <footer>
             <p>&copy; @DateTime.Now.Year - 我的 ASP.NET 應用程式</p>

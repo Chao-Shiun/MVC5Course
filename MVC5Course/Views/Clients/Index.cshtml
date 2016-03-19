@@ -2,12 +2,18 @@
 
 @{
     ViewBag.Title = "Index";
+    if(IsAjax)
+    {
+        Layout = "";
+    }
+    var CommAjaxOptions = new AjaxOptions() { UpdateTargetId = "AjaxPanel" };
 }
+
 
 <h2>Index</h2>
 
 <p>
-    @Ajax.ActionLink("Create New", "Create", new AjaxOptions() { UpdateTargetId = "AjaxPanel" })
+    @Ajax.ActionLink("Create New", "Create", CommAjaxOptions)
 </p>
 <table class="table">
     <tr>
@@ -54,9 +60,9 @@
                 @Html.DisplayFor(modelItem => item.CreditRating)
             </td>
             <td>
-                @Ajax.ActionLink("Edit", "Edit", new { id = item.ClientId }, new AjaxOptions() { UpdateTargetId = "AjaxPanel" }) |
-                @Ajax.ActionLink("Details", "Details", new { id = item.ClientId }, new AjaxOptions() { UpdateTargetId = "AjaxPanel" }) |
-                @Ajax.ActionLink("Delete", "Delete", new { id = item.ClientId }, new AjaxOptions() { UpdateTargetId = "AjaxPanel" })
+                @Ajax.ActionLink("Edit", "Edit", new { id = item.ClientId }, CommAjaxOptions) |
+                @Ajax.ActionLink("Details", "Details", new { id = item.ClientId }, CommAjaxOptions) |
+                @Ajax.ActionLink("Delete", "Delete", new { id = item.ClientId }, CommAjaxOptions)
             </td>
         </tr>
     }
