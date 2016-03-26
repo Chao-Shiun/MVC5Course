@@ -16,11 +16,11 @@ namespace MVC5Course.Controllers
         private FabricsEntities db = new FabricsEntities();
 
         // GET: Clients
-        public ActionResult Index(int pageNo = 1)
+        public ActionResult Index(int? id, int pageNo = 1)
         {
             var client = db.Client.Include(c => c.Occupation).OrderBy(x => x.ClientId);
             var data = client.ToPagedList(pageNo, 10);
-
+            ViewBag.pageNo = pageNo;
             return View(data);
         }
 
@@ -51,7 +51,7 @@ namespace MVC5Course.Controllers
         // 詳細資訊，請參閱 http://go.microsoft.com/fwlink/?LinkId=317598。
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "ClientId,FirstName,MiddleName,LastName,Gender,DateOfBirth,CreditRating,XCode,OccupationId,TelephoneNumber,Street1,Street2,City,ZipCode,Longitude,Latitude,Notes")] Client client)
+        public ActionResult Create([Bind(Include = "ClientId,FirstName,MiddleName,LastName,Gender,DateOfBirth,CreditRating,XCode,OccupationId,TelephoneNumber,Street1,Street2,City,ZipCode,Longitude,Latitude,Notes")] Client client, int pageNo = 1)
         {
             if (ModelState.IsValid)
             {
@@ -85,13 +85,15 @@ namespace MVC5Course.Controllers
         // 詳細資訊，請參閱 http://go.microsoft.com/fwlink/?LinkId=317598。
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "ClientId,FirstName,MiddleName,LastName,Gender,DateOfBirth,CreditRating,XCode,OccupationId,TelephoneNumber,Street1,Street2,City,ZipCode,Longitude,Latitude,Notes")] Client client)
+        public ActionResult Edit([Bind(Include = "ClientId,FirstName,MiddleName,LastName,Gender,DateOfBirth,CreditRating,XCode,OccupationId,TelephoneNumber,Street1,Street2,City,ZipCode,Longitude,Latitude,Notes")] Client client, int pageNo = 1)
         {
             if (ModelState.IsValid)
             {
                 db.Entry(client).State = EntityState.Modified;
                 db.SaveChanges();
-                return this.Index();
+                if (!TempData.ContainsKey("alert"))
+                    TempData.Add("alert", @"剛剛修改的編號為\r\n\r\n" + client.ClientId);
+                return RedirectToAction("Index", new { pageNo = pageNo });
                 /*
                 傳入此字典的模型項目為型別 'System.Collections.Generic.List`1[MVC5Course.Models.Client]'，但是此字典需要型別 'MVC5Course.Models.Client' 的模型項目。
                 */

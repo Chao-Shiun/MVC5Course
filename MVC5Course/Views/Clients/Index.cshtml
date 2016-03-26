@@ -11,6 +11,12 @@
         Layout = "";
     }
     var CommAjaxOptions = new AjaxOptions() { UpdateTargetId = "AjaxPanel", LoadingElementId = "loading" };
+    if (TempData.ContainsKey("alert"))
+    {
+        <script>
+            alert('@Ajax.JavaScriptStringEncode(TempData["alert"].ToString())');
+        </script>
+    }
 }
 
 <h2>Index</h2>
@@ -65,7 +71,8 @@
                 @Html.DisplayFor(modelItem => item.CreditRating)
             </td>
             <td>
-                @Ajax.ActionLink("Edit", "Edit", new { id = item.ClientId }, CommAjaxOptions) |
+                @Ajax.ActionLink("Edit", "Edit", new { id = item.ClientId, pageNo = (int)ViewBag.pageNo }, CommAjaxOptions)
+                |
                 @Ajax.ActionLink("Details", "Details", new { id = item.ClientId }, CommAjaxOptions) |
                 @Ajax.ActionLink("Delete", "Delete", new { id = item.ClientId }, CommAjaxOptions)
             </td>
@@ -74,7 +81,7 @@
 
 </table>
 
-@Html.PagedListPager(data, p => Url.Action("Index", new { pageNo = p }),PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing("main"))
+@Html.PagedListPager(data, p => Url.Action("Index", new { pageNo = p }), PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing("main"))
 <div id="AjaxPanel">
 
 </div>
