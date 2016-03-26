@@ -26,6 +26,7 @@ namespace MVC5Course.Controllers
         {
             return db.Product;
         }
+       
 
         // GET: api/ProductsApi/5
         [ResponseType(typeof(Product))]
