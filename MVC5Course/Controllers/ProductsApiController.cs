@@ -18,15 +18,20 @@ namespace MVC5Course.Controllers
 
         public ProductsApiController()
         {
-            db.Configuration.LazyLoadingEnabled = false;
+            db.Configuration.LazyLoadingEnabled = true;
         }
 
         // GET: api/ProductsApi
-        public IQueryable<Product> GetProduct()
+        public IQueryable<ProductApiViewModel> GetProduct()
         {
-            return db.Product;
+            return from p in db.Product
+                   select new ProductApiViewModel()
+                   {
+                       id = p.ProductId,
+                       name = p.ProductName
+                   };
         }
-       
+
 
         // GET: api/ProductsApi/5
         [ResponseType(typeof(Product))]

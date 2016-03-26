@@ -205,6 +205,7 @@
     <Compile Include="Controllers\MemberController.cs" />
     <Compile Include="Controllers\NewLayoutController.cs" />
     <Compile Include="Controllers\OrderLinesController.cs" />
+    <Compile Include="Models\ProductApiViewModel.cs" />
     <Compile Include="Controllers\ProductsApiController.cs" />
     <Compile Include="Controllers\ProductsController.cs" />
     <Compile Include="Controllers\TestController.cs" />
